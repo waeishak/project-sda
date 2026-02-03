@@ -1,3 +1,4 @@
-flask
-supabase
+Flask
+Flask-SQLAlchemy
+psycopg2-binary
 python-dotenv

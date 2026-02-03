@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  # 1. ส่วนของ Database (PostgreSQL)
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: myuser        # ชื่อผู้ใช้ Database
+      POSTGRES_PASSWORD: mypassword # รหัสผ่าน
+      POSTGRES_DB: flask_blog       # ชื่อ Database
+    volumes:
+      - pg_data:/var/lib/postgresql/data # *สำคัญ* เก็บข้อมูลไว้ถาวรใน Volume นี้
+    ports:
+      - "5432:5432" # เปิด Port ให้เครื่องเรา connect เข้าไปดูข้อมูลได้ (Optional)
+
+  # 2. ส่วนของ Web App (Flask)
+  web:
+    build: .
+    ports:
+      - "5000:5000" # เข้าเว็บผ่าน localhost:5000
+    depends_on:
+      - db # รอให้ db รันเสร็จก่อนค่อยรันเว็บ
+    restart: on-failure
+    environment:
+      # Connection String: เชื่อมต่อไปยัง host ชื่อ "db" (ตามชื่อ service ด้านบน)
+      - DATABASE_URL=postgresql://myuser:mypassword@db:5432/flask_blog
+
+volumes:
+  pg_data: # ประกาศ Volume สำหรับเก็บข้อมูล

@@ -1,53 +1,70 @@
-from flask import Flask, render_template, request, redirect
-from supabase import create_client, Client
-from dotenv import load_dotenv
 import os
-
-load_dotenv()
-
-url = os.getenv("SUPABASE_URL")
-key = os.getenv("SUPABASE_KEY")
-
-supabase: Client = create_client(url, key)
+from flask import Flask, render_template, request, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-# Home page: list all blog posts
+# --- ส่วนตั้งค่า Database ---
+db_url = os.environ.get('DATABASE_URL', 'sqlite:///local.db')
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+# --- ส่วนสร้างตาราง (Model) ---
+class Post(db.Model):
+    __tablename__ = 'posts'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+
+with app.app_context():
+    db.create_all()
+
+# --- Routes ---
+
 @app.route('/')
 def index():
-    posts = supabase.table('posts').select('*').order('created_at', desc=True)\
-        .execute()
-    return render_template('index.html', posts=posts.data)
+    posts = Post.query.all()
+    return render_template('index.html', posts=posts)
 
-# Add a new post
+# แก้ไขจุดที่ 1: ใช้ route /add และเรียกไฟล์ add.html
 @app.route('/add', methods=['GET', 'POST'])
-def add_post():
+def create():
     if request.method == 'POST':
         title = request.form['title']
         content = request.form['content']
-        supabase.table('posts').insert({'title': title, 'content': content})\
-            .execute()
-        return redirect('/')
-    return render_template('add.html')
+        
+        new_post = Post(title=title, content=content)
+        db.session.add(new_post)
+        db.session.commit()
+        
+        return redirect(url_for('index'))
+    return render_template('add.html')  # แก้เป็น add.html ตามโครงสร้างจริง
 
-# Delete a post
-@app.route('/delete/<int:post_id>')
-def delete_post(post_id):
-    supabase.table('posts').delete().eq('id', post_id).execute()
-    return redirect('/')
+# ลบโพสต์
+@app.route('/delete/<int:id>')
+def delete(id):
+    post_to_delete = Post.query.get_or_404(id)
+    db.session.delete(post_to_delete)
+    db.session.commit()
+    return redirect(url_for('index'))
 
-# Edit a post
-@app.route('/edit/<int:post_id>', methods=['GET', 'POST'])
-def edit_post(post_id):
-    post = supabase.table('posts').select('*').eq('id', post_id).single().\
-        execute().data
+# แก้ไขจุดที่ 2: เรียกไฟล์ edit.html (เผื่อคุณใช้ฟีเจอร์นี้ต่อ)
+@app.route('/edit/<int:id>', methods=['GET', 'POST']) 
+def update(id):
+    post = Post.query.get_or_404(id)
+    
     if request.method == 'POST':
-        title = request.form['title']
-        content = request.form['content']
-        supabase.table('posts').update({'title': title, 'content': content}).\
-            eq('id', post_id).execute()
-        return redirect('/')
+        post.title = request.form['title']
+        post.content = request.form['content']
+        db.session.commit()
+        return redirect(url_for('index'))
+        
     return render_template('edit.html', post=post)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)
