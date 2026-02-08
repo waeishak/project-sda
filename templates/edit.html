@@ -1,11 +1,86 @@
-{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Post</title>
+    <style>
+        /* ดีไซน์เดิม (Dark Theme) */
+        body { background-color: #2c3e50; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding-top: 50px; }
+        h1 { color: #5bc0de; margin-bottom: 30px; }
+        form { width: 100%; max-width: 800px; padding: 0 20px; }
+        input[type="text"], textarea { width: 100%; padding: 12px; margin-bottom: 20px; background-color: #34495e; border: 1px solid #5bc0de; color: white; border-radius: 5px; font-size: 16px; box-sizing: border-box; }
+        input:focus, textarea:focus { outline: none; box-shadow: 0 0 5px #5bc0de; }
+        .btn-update { background-color: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; margin-right: 10px; }
+        .btn-update:hover { background-color: #218838; }
+        .btn-back { background-color: #5bc0de; color: white; border: none; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-size: 16px; display: inline-block; }
+        .btn-back:hover { background-color: #31b0d5; }
 
-{% block content %}
-<h1>Edit Post</h1>
-<form method="post">
-    <input type="text" name="title" value="{{ post.title }}" required>
-    <textarea name="content" rows="5" required>{{ post.content }}</textarea>
-    <button type="submit">Update</button>
-</form>
-<a class="back-link" href="/">Go Back</a>
-{% endblock %}
+        /* --- กล่อง Conflict (ส่วนใหม่) --- */
+        .conflict-box {
+            background-color: #e74c3c;
+            border: 2px solid #c0392b;
+            color: white;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 800px;
+            box-sizing: border-box;
+        }
+        .conflict-header {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            padding-bottom: 5px;
+        }
+        .conflict-data {
+            background-color: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Edit Post</h1>
+
+    {% if conflict %}
+    <div class="conflict-box">
+        <div class="conflict-header">⚠️ แจ้งเตือน: มีคนแก้ไขก่อนคุณ!</div>
+        <p>ข้อมูลล่าสุดใน Server (Version {{ post.version }}) คือ:</p>
+        
+        <div class="conflict-data">
+            <strong>Title ล่าสุด:</strong> {{ post.title }}<br>
+            <strong>Content ล่าสุด:</strong> {{ post.content }}<br>
+            </div>
+
+        <p style="margin-top: 10px; font-size: 0.9em;">
+            * หากคุณกด <strong>Update</strong> อีกครั้ง จะเป็นการ <strong>บันทึกทับ</strong> ข้อมูลล่าสุดนี้ทันที
+        </p>
+    </div>
+    {% endif %}
+
+    <form method="POST">
+        <input type="hidden" name="version" value="{{ post.version }}">
+
+        <label>Title</label>
+        <input type="text" name="title" 
+               value="{{ draft_title if conflict else post.title }}" 
+               required>
+        
+        <label>Content</label>
+        <textarea name="content" rows="6" required>{{ draft_content if conflict else post.content }}</textarea>
+        
+        <br>
+        <button type="submit" class="btn-update">
+            {% if conflict %} Confirm Overwrite {% else %} Update {% endif %}
+        </button>
+        <a href="{{ url_for('index') }}" class="btn-back">Cancel</a>
+    </form>
+
+</body>
+</html>
