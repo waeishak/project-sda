@@ -1,86 +1,116 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Post</title>
-    <style>
-        /* ดีไซน์เดิม (Dark Theme) */
-        body { background-color: #2c3e50; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding-top: 50px; }
-        h1 { color: #5bc0de; margin-bottom: 30px; }
-        form { width: 100%; max-width: 800px; padding: 0 20px; }
-        input[type="text"], textarea { width: 100%; padding: 12px; margin-bottom: 20px; background-color: #34495e; border: 1px solid #5bc0de; color: white; border-radius: 5px; font-size: 16px; box-sizing: border-box; }
-        input:focus, textarea:focus { outline: none; box-shadow: 0 0 5px #5bc0de; }
-        .btn-update { background-color: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; margin-right: 10px; }
-        .btn-update:hover { background-color: #218838; }
-        .btn-back { background-color: #5bc0de; color: white; border: none; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-size: 16px; display: inline-block; }
-        .btn-back:hover { background-color: #31b0d5; }
+{% extends "layout.html" %}
 
-        /* --- กล่อง Conflict (ส่วนใหม่) --- */
-        .conflict-box {
-            background-color: #e74c3c;
-            border: 2px solid #c0392b;
-            color: white;
-            padding: 20px;
-            margin-bottom: 25px;
-            border-radius: 8px;
-            width: 100%;
-            max-width: 800px;
-            box-sizing: border-box;
-        }
-        .conflict-header {
-            font-weight: bold;
-            font-size: 1.1em;
-            margin-bottom: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.3);
-            padding-bottom: 5px;
-        }
-        .conflict-data {
-            background-color: rgba(0,0,0,0.2);
-            padding: 10px;
-            border-radius: 4px;
-            font-family: monospace;
-            margin-top: 5px;
-        }
-    </style>
-</head>
-<body>
+{% block content %}
+<style>
+    /* ใช้ธีม Dark แบบเดิม */
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        color: white;
+    }
 
-    <h1>Edit Post</h1>
+    h1 { color: #5bc0de; margin-bottom: 20px; }
+
+    /* กล่องแสดงเนื้อหาเดิม (Read Only) */
+    .read-only-box {
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid #4ecdc4;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+    .history-box {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-left: 4px solid #5bc0de;
+        padding: 10px 15px;
+        margin-top: 10px;
+        border-radius: 0 4px 4px 0;
+    }
+
+    /* กล่องแจ้งเตือน Conflict */
+    .conflict-box {
+        background-color: #fff3cd;
+        border: 1px solid #ffeeba;
+        color: #856404;
+        padding: 20px;
+        margin-bottom: 25px;
+        border-radius: 8px;
+    }
+
+    /* Form Styles */
+    form { width: 100%; }
+    
+    label { 
+        display: block; 
+        margin-bottom: 10px; 
+        font-weight: bold; 
+        color: #5bc0de; 
+        font-size: 1.1em;
+    }
+
+    textarea { 
+        width: 100%; 
+        padding: 15px; 
+        margin-bottom: 20px; 
+        background-color: #34495e; 
+        border: 1px solid #5bc0de; 
+        color: white; 
+        border-radius: 5px; 
+        font-size: 16px; 
+        box-sizing: border-box; 
+    }
+    textarea:focus { outline: none; box-shadow: 0 0 8px #5bc0de; }
+
+    .btn-submit { background-color: #28a745; color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-size: 16px; margin-right: 10px; }
+    .btn-submit:hover { background-color: #218838; }
+    
+    .btn-back { background-color: #6c757d; color: white; border: none; padding: 12px 25px; border-radius: 5px; text-decoration: none; font-size: 16px; display: inline-block; }
+    .btn-back:hover { background-color: #5a6268; }
+</style>
+
+<div class="container">
+
+    <h1>Add Update to: <span style="color: white;">{{ post.title }}</span></h1>
 
     {% if conflict %}
     <div class="conflict-box">
-        <div class="conflict-header">⚠️ แจ้งเตือน: มีคนแก้ไขก่อนคุณ!</div>
-        <p>ข้อมูลล่าสุดใน Server (Version {{ post.version }}) คือ:</p>
-        
-        <div class="conflict-data">
-            <strong>Title ล่าสุด:</strong> {{ post.title }}<br>
-            <strong>Content ล่าสุด:</strong> {{ post.content }}<br>
-            </div>
-
-        <p style="margin-top: 10px; font-size: 0.9em;">
-            * หากคุณกด <strong>Update</strong> อีกครั้ง จะเป็นการ <strong>บันทึกทับ</strong> ข้อมูลล่าสุดนี้ทันที
-        </p>
+        <h3>⚠️ แจ้งเตือน: มีการอัปเดตตัดหน้า!</h3>
+        <p>ขณะที่คุณกำลังพิมพ์ มีคนอื่นได้เพิ่มข้อมูลใหม่เข้าไปแล้ว (Version {{ post.version }})</p>
+        <p><strong>ข้อมูลที่คุณพิมพ์ค้างไว้ ยังอยู่ในกล่องข้อความด้านล่าง</strong> กรุณาตรวจสอบประวัติการอัปเดตล่าสุดด้านบน แล้วกด Submit อีกครั้งเพื่อยืนยัน</p>
     </div>
     {% endif %}
 
+    <div class="read-only-box">
+        <h3 style="margin-top: 0; color: #ffc107;">Original Post:</h3>
+        <p style="font-size: 1.1em;">{{ post.content }}</p>
+        <small style="color: #aaa;">By: {{ post.author.username }}</small>
+
+        {% if post.updates %}
+            <hr style="border-color: rgba(255,255,255,0.2); margin: 20px 0;">
+            <h4 style="margin-bottom: 10px;">Previous Updates:</h4>
+            {% for update in post.updates %}
+                <div class="history-box">
+                    <p style="margin: 0 0 5px 0;">{{ update.content }}</p>
+                    <small style="color: #aaa;">
+                        - {{ update.user.username }} ({{ update.updated_at.strftime('%H:%M') }})
+                    </small>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
     <form method="POST">
         <input type="hidden" name="version" value="{{ post.version }}">
+        <input type="hidden" name="title" value="{{ post.title }}">
 
-        <label>Title</label>
-        <input type="text" name="title" 
-               value="{{ draft_title if conflict else post.title }}" 
-               required>
-        
-        <label>Content</label>
-        <textarea name="content" rows="6" required>{{ draft_content if conflict else post.content }}</textarea>
+        <label for="content">New Update / Comment:</label>
+        <textarea name="content" id="content" rows="5" required 
+                  placeholder="พิมพ์ข้อความอัปเดตเพิ่มเติมที่นี่...">{{ draft_content if conflict else '' }}</textarea>
         
         <br>
-        <button type="submit" class="btn-update">
-            {% if conflict %} Confirm Overwrite {% else %} Update {% endif %}
-        </button>
+        <button type="submit" class="btn-submit">Submit Update</button>
         <a href="{{ url_for('index') }}" class="btn-back">Cancel</a>
     </form>
 
-</body>
-</html>
+</div>
+{% endblock %}
