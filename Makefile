@@ -12,7 +12,7 @@ help:
 	@echo "  make shell    Enter the web container shell"
 
 up:
-	$(COMPOSE) up --build
+	$(COMPOSE) up -d --build
 
 down:
 	$(COMPOSE) down
