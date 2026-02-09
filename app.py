@@ -87,6 +87,9 @@ class PostUpdate(db.Model):
     # เชื่อมกับ User คนที่มาแก้ไข (อาจไม่ใช่เจ้าของโพสต์ก็ได้)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
+with app.app_context():
+    db.create_all()
+
 # --- Routes (Login/Register) ---
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -239,4 +242,4 @@ def heavy_cpu_task(task_name):
     print(f"🔥🔥 [Parallel Finish] Process ID: {pid} คำนวณเสร็จแล้ว! ผลลัพธ์: {result}")
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=False)
+    app.run(host='0.0.0.0', debug=True)
