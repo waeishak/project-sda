@@ -39,9 +39,6 @@ class Post(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     version = db.Column(db.Integer, default=1)
 
-with app.app_context():
-    db.create_all()
-
 # --- Routes ---
 
 @app.route('/')
@@ -150,4 +147,4 @@ def heavy_cpu_task(task_name):
     print(f"🔥🔥 [Parallel Finish] Process ID: {pid} คำนวณเสร็จแล้ว! ผลลัพธ์: {result}")
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=False)
