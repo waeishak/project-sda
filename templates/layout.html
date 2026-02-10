@@ -1,131 +1,199 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Blog Site</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comeng Blog</title>
     <style>
-        /* General body and font settings */
+        /* --- General Settings & Typography --- */
         body { 
-            font-family: "Fira Code", monospace; 
-            background-color: #282c34; /* Atom One Dark background */
-            color: #abb2bf; /* default text color */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #282c34; 
+            color: #abb2bf; 
             margin: 0; 
             padding: 0; 
+            font-size: 16px; 
+            padding-top: 90px; 
+            
+            /* Sticky Footer Setup */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
 
         /* Main container */
         .container { 
-            width: 80%; 
-            margin: auto; 
-            padding: 20px; 
+            width: 95%;       
+            max-width: 850px; 
+            margin: 0 auto;     
+            padding: 30px 20px; 
+            box-sizing: border-box;
+            flex: 1; 
         }
 
-        h1 { 
-            text-align: center; 
-            color: #61dafb; /* heading color */
-        }
+        h1, h2, h3 { color: #61dafb; font-weight: 600; }
+        a { text-decoration: none; transition: color 0.2s; }
 
-        a { 
-            text-decoration: none; 
-        }
-
-        /* Blog post card styling */
-        .post { 
-            background: #3a3f4b; /* slightly lighter than background */
-            padding: 15px; 
-            margin-bottom: 15px; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5); 
-        }
-        .post h2 { 
-            margin: 0; 
-            color: #e06c75; /* title color */
-        }
-        .post p { 
-            margin: 10px 0; 
-        }
-        .post .meta { 
-            font-size: 0.85em; 
-            color: #56b6c2; /* meta info color */
-        }
-
-        /* Button styling */
-        .btn { 
-            display: inline-block; 
-            padding: 5px 10px; 
-            border-radius: 5px; 
-            color: white; 
-            margin-top: 5px; 
-            cursor: pointer; 
-        }
-
-        .edit-btn { 
-            background-color: #f1c40f; /* Edit button: Yellow */ 
-        }
-        .edit-btn:hover { 
-            background-color: #d4ac0d; 
-        }
-
-        .delete-btn { 
-            background-color: #e74c3c; /* Delete button: Red */ 
-        }
-        .delete-btn:hover { 
-            background-color: #c0392b; 
-        }
-
-        .add-btn { 
-            background-color: #61dafb; /* Add button: Blue */ 
-            color: #282c34; 
-        }
-        .add-btn:hover { 
-            background-color: #21a1f1; 
-            color: #fff; 
-        }
-
-        /* Form input and textarea styling */
-        form input, form textarea { 
-            width: 100%; 
-            padding: 10px; 
-            margin-bottom: 10px; 
-            border-radius: 5px; 
-            border: 1px solid #61dafb; 
+        /* --- Header Navbar Styling --- */
+        .navbar {
+            position: fixed; top: 0; left: 0; width: 100%; 
+            height: 70px; 
             background-color: #21252b; 
-            color: #abb2bf; 
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 30px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4); 
+            border-bottom: 3px solid #3a3f4b;
+            z-index: 1000; box-sizing: border-box;
+        }
+        .nav-brand { 
+            font-size: 1.8em; 
+            font-weight: 700; 
+            color: #61dafb; 
+            letter-spacing: 1px; 
+        }
+        .nav-links a { color: #abb2bf; margin-left: 25px; font-weight: 600; font-size: 1.05em; }
+        .nav-links a:hover { color: #61dafb; }
+
+        /* --- Blog Post Card Styling --- */
+        .post { 
+            background: #323844; 
+            padding: 25px; 
+            margin-bottom: 25px; 
+            border-radius: 12px; 
+            border: 1px solid #3a3f4b; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); 
+            transition: all 0.3s ease; 
+        }
+        .post:hover {
+            transform: translateY(-5px); /* ลอยขึ้นเมื่อเอาเมาส์ชี้ */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3); 
+            border-color: #61dafb; 
         }
 
-        /* Form submit button */
-        form button { 
-            padding: 10px 20px; 
-            border: none; 
-            border-radius: 5px; 
-            background-color: #28a745; /* green */ 
-            color: white; 
-            cursor: pointer; 
+        .post h2 { 
+            margin-top: 0; 
+            margin-bottom: 15px;
+            font-size: 1.7em; 
+            color: #e06c75; 
         }
-        form button:hover { 
-            background-color: #218838; 
+        .post p { margin: 15px 0; line-height: 1.6; }
+        .post .meta { font-size: 0.9em; color: #8891a0; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
+
+        /* --- Image & Hero Banner CSS --- */
+        .post img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 15px 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border: 1px solid #3a3f4b;
         }
 
-        /* Back button styling */
-        a.back-link {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 5px;
-            background-color: #61dafb; /* blue for Go Back */
-            color: #282c34; /* contrast text */
+        .hero-banner {
+            /* [เปลี่ยนรูปตรงนี้ครับ] ใช้รูปบรรยากาศ Community โทนมืด/แสงสลัว */
+            background-image: url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80');
+            
+            background-size: cover;
+            background-position: center;
+            height: 250px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        }
+        /* ปรับ Layer สีดำให้จางลง (0.5) เพราะรูปพื้นหลังมืดอยู่แล้ว */
+        .hero-banner::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(33, 37, 43, 0.5); 
+            transition: background 0.3s;
+        }
+        .hero-banner:hover::before { background: rgba(33, 37, 43, 0.3); }
+        .hero-content { position: relative; z-index: 1; color: white; }
+        .hero-content h1 { font-size: 2.5em; margin: 0; color: #61dafb; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+        .hero-content p { font-size: 1.2em; color: #abb2bf; margin-top: 10px; }
+
+
+        /* --- Button Styling --- */
+        .btn { display: inline-block; padding: 8px 15px; border-radius: 6px; color: white; margin-top: 10px; cursor: pointer; font-weight: 600; border: none; transition: background 0.2s, transform 0.1s; }
+        .btn:active { transform: scale(0.98); } 
+        .edit-btn { background-color: #e5c07b; color: #282c34; } 
+        .edit-btn:hover { background-color: #d1ad60; }
+        .delete-btn { background-color: #e06c75; }
+        .delete-btn:hover { background-color: #c25d66; }
+        .add-btn { background-color: #61dafb; color: #282c34; font-size: 1.1em; padding: 10px 20px; }
+        .add-btn:hover { background-color: #4fa8c7; color: #fff; }
+
+        /* --- Form Styling --- */
+        form input, form textarea { 
+            width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 6px; 
+            border: 2px solid #3a3f4b; 
+            background-color: #21252b; color: #abb2bf; box-sizing: border-box; font-size: 1em;
+        }
+        form input:focus, form textarea:focus { border-color: #61dafb; outline: none; }
+        form button { padding: 12px 25px; border: none; border-radius: 6px; background-color: #98c379; color: #282c34; cursor: pointer; font-size: 1.1em; font-weight: bold; }
+        form button:hover { background-color: #7fa864; }
+
+        /* --- Footer Styling --- */
+        .footer {
+            background-color: #21252b; 
+            color: #8891a0;
+            padding: 35px 20px; 
+            text-align: center;
+            margin-top: 50px;
+            border-top: 3px solid #3a3f4b; 
+        }
+        .footer p { margin: 8px 0; font-size: 0.95em; }
+        .footer-link {
+            color: #61dafb;
+            font-weight: 700;
             text-decoration: none;
-            margin-top: 10px;
-            cursor: pointer;
+            border: 2px solid #61dafb; 
+            padding: 8px 20px; 
+            border-radius: 30px;
+            display: inline-block;
+            margin-top: 15px;
+            transition: all 0.3s;
         }
-        a.back-link:hover {
-            background-color: #21a1f1;
-            color: #fff;
+        .footer-link:hover {
+            background-color: #61dafb;
+            color: #21252b;
+            box-shadow: 0 0 15px rgba(97, 218, 251, 0.4); 
         }
-
     </style>
 </head>
 <body>
+
+    <nav class="navbar">
+        <a href="{{ url_for('index') }}" class="nav-brand">Comeng</a> 
+        <div class="nav-links">
+            {% if current_user.is_authenticated %}
+                <span>Hi, <strong>{{ current_user.username }}</strong></span>
+                <a href="{{ url_for('logout') }}" style="color: #e06c75;">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" style="color: #61dafb;">Login</a>
+                <a href="{{ url_for('register') }}" style="color: #61dafb;">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
     <div class="container">
         {% block content %}{% endblock %}
     </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 <strong>Comeng</strong> Blog. All rights reserved.</p>
+        <p>Designed for High Concurrency & Collaboration.</p>
+        
+        <a href="https://asia-southeast1-sda-project-48621.cloudfunctions.net/hello_web" target="_blank" class="footer-link">
+            About Us
+        </a>
+    </footer>
+
 </body>
 </html>
