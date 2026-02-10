@@ -17,7 +17,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 email_counter = 0
 counter_lock = threading.Lock()
 
-# Thread Pool สำหรับงาน I/O (ส่งเมล)
+# Thread Pool สำหรับงาน
 executor = ThreadPoolExecutor(max_workers=5)
 
 # Process Pool สำหรับงาน CPU (คำนวณหนักๆ)
